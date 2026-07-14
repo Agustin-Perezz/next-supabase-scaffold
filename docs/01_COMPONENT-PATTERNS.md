@@ -163,7 +163,7 @@ Do not pass entire objects when only a few fields are needed.
 Use React Context to inject dependencies in client code. Use the container pattern in server code:
 
 ```ts
-import { createBooksContainer } from "@/modules/books/books.container";
+import { createBooksContainer } from "@/lib/containers/books.container";
 
 export async function GET(request: Request) {
   const { create } = createBooksContainer();
