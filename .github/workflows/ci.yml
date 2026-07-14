@@ -43,6 +43,8 @@ jobs:
           version: latest
       - name: Start Supabase
         run: supabase start -x imgproxy,edge-runtime,logflare,vector,pgbouncer
+      - name: Reset database with migrations
+        run: supabase db reset
       - name: Get Playwright version
         id: playwright-version
         run: echo "version=$(pnpm list @playwright/test --depth=0 --json | jq -r '.[0].devDependencies["@playwright/test"].version')" >> $GITHUB_OUTPUT

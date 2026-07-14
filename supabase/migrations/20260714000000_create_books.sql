@@ -16,3 +16,5 @@ create policy "Anyone can insert books"
   on public.books
   for insert
   with check (true);
+
+grant select, insert on public.books to anon, authenticated;
