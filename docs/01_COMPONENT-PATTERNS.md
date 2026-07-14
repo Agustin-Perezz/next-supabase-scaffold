@@ -32,6 +32,13 @@ export default async function Page() {
 }
 ```
 
+Shared UI primitives are imported from `@/shared/components/ui/*`:
+
+```tsx
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+```
+
 For client-driven pages, keep `page.tsx` as a thin Server Component shell that renders a single client entry component:
 
 ```tsx
