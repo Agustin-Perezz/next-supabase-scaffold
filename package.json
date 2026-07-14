@@ -13,6 +13,11 @@
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:install": "playwright install --with-deps chromium",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:push": "supabase db push",
+    "supabase:reset": "supabase db reset",
+    "supabase:gen-types": "supabase gen types --typescript --project-id ypdlrfoioxdlcowdjpiz --schema public > src/infrastructure/database/postgres/database.types.ts",
     "prepare": "husky"
   },
   "nano-staged": {
