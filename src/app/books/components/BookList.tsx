@@ -12,7 +12,10 @@ export function BookList({ books }: BookListProps) {
   }
 
   return (
-    <ul className="mt-8 divide-y divide-zinc-200 rounded-lg border border-zinc-200">
+    <ul
+      className="mt-8 divide-y divide-zinc-200 rounded-lg border border-zinc-200"
+      data-testid="book-list"
+    >
       {books.map((book) => (
         <BookCard key={book.id} book={book} />
       ))}
