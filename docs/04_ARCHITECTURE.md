@@ -8,16 +8,27 @@ src/
 │   └── entities/
 │       ├── book.entity.ts         # Domain entity (Book class, factory + invariants)
 │       ├── book.schema.ts         # Zod invariant schemas (source of truth for validation)
+│       ├── auth.schema.ts         # Zod email schema (shared by auth use cases)
+│       ├── oauth-provider.enum.ts # OAuthProvider enum (Google, Facebook)
 │       └── errors.ts              # Domain errors (BookNotFoundError, InvalidBookError, etc.)
 │
 ├── application/                   # Application logic, one folder per use case
 │   └── use-cases/
-│       └── books/
-│           └── create-book/
-│               ├── create-book.use-case.ts            # class CreateBookUseCase { execute() }
-│               ├── create-book.repository.interface.ts # interface — use case depends on this, not the impl
-│               ├── create-book.request.dto.ts         # Zod schema + z.infer type (input contract)
-│               └── create-book.response.dto.ts         # Plain type (output contract — not Zod)
+│       ├── books/
+│       │   └── create-book/
+│       │       ├── create-book.use-case.ts            # class CreateBookUseCase { execute() }
+│       │       ├── create-book.repository.interface.ts # interface — use case depends on this, not the impl
+│       │       ├── create-book.request.dto.ts         # Zod schema + z.infer type (input contract)
+│       │       └── create-book.response.dto.ts         # Plain type (output contract — not Zod)
+│       └── auth/
+│           ├── sign-in-with-magic-link/
+│           │   ├── sign-in-with-magic-link.use-case.ts
+│           │   ├── sign-in-with-magic-link.repository.interface.ts
+│           │   └── sign-in-with-magic-link.request.dto.ts
+│           └── sign-in-with-oauth/
+│               ├── sign-in-with-oauth.use-case.ts
+│               ├── sign-in-with-oauth.repository.interface.ts
+│               └── sign-in-with-oauth.request.dto.ts
 │
 ├── infrastructure/                # External concerns (DB, APIs)
 │   └── database/
@@ -28,18 +39,21 @@ src/
 │           ├── mappers/          # Flat, one file per entity. Reused by every repo that touches the entity.
 │           │   └── book.mapper.ts # toDomain(row) + toPersistence(book)
 │           └── repositories/     # Repository implementations (implement use-case interfaces)
-│               └── books/
-│                   └── supabase-create-book.repository.ts
+│               ├── books/
+│               │   └── supabase-create-book.repository.ts
+│               └── auth/
+│                   └── supabase-auth.repository.ts     # Implements both magic-link and OAuth interfaces
 │
 └── lib/                           # Cross-cutting wiring + shared infra
     ├── containers/               # DI wiring (connects use cases to concrete repos)
-    │   └── books.container.ts
+    │   ├── books.container.ts
+    │   └── auth.container.ts
     └── shared/
         └── infrastructure/
             ├── env.ts             # Env validation — throws if missing (no defaults)
             ├── supabase.server.ts  # Per-request server client (cookies())
             ├── supabase.browser.ts # Browser client (createBrowserClient)
-            └── auth.server.ts      # (future) getUser(), requireUser() helpers
+            └── auth.server.ts      # getUser(), requireUser() helpers + auth path constants
 ```
 
 ## Layer Responsibilities
