@@ -15,7 +15,7 @@ A production-ready [Next.js](https://nextjs.org) starter built on the App Router
 | Database        | Supabase (Postgres + Auth + Storage)           |
 | Supabase client | `@supabase/ssr` (cookie-based SSR auth)        |
 | Lint / Format   | Biome 2                                        |
-| E2E             | Playwright (Chromium)                          |
+| E2E             | Playwright (Chromium) + Monocart Reporter    |
 | Monitoring      | Sentry (`@sentry/nextjs`)                      |
 | Security scan   | Snyk (SARIF → GitHub Code Scanning)            |
 | Package manager | pnpm 9                                         |
@@ -52,7 +52,9 @@ next-supabase-scaffold/
 │   ├── components/
 │   │   └── ui/                   # Reusable base-ui / shadcn primitives
 │   └── proxy.ts                  # Session refresh via @supabase/ssr (formerly middleware.ts)
-├── tests/                        # Playwright E2E specs
+├── tests/                        # Playwright E2E specs + shared fixtures
+├── playwright.config.ts          # Playwright config (monocart reporter, V8 coverage)
+├── playwright.monocart-reporter.ts  # Monocart coverage + report config
 ├── biome.json                    # Linter & formatter config
 ├── next.config.ts                # Next.js configuration
 ├── package.json
@@ -117,9 +119,12 @@ supabase stop                            # Stop local stack
 | `pnpm lint`         | Run Biome lint & format checks           |
 | `pnpm format`       | Auto-format with Biome                   |
 | `pnpm typecheck`    | Run TypeScript type checking (`tsc --noEmit`) |
-| `pnpm test`         | Run Playwright E2E tests                 |
-| `pnpm test:ui`      | Run Playwright with interactive UI       |
-| `pnpm test:install` | Install Playwright Chromium browser      |
+| `pnpm test`         | Reset DB + run Playwright E2E tests       |
+| `pnpm test:ui`      | Reset DB + run Playwright in UI mode      |
+| `pnpm test:ci`      | Run Playwright only (no DB reset, for CI) |
+| `pnpm test:install` | Install Playwright Chromium browser       |
+| `pnpm test:show-report`     | Open Monocart HTML test report   |
+| `pnpm coverage:show-report` | Open V8 coverage report          |
 
 ## Architecture
 
@@ -134,6 +139,47 @@ src/
 └── app/               # Delivery layer (Server Components, Server Actions, UI components)
 ```
 
+## Testing
+
+E2E tests use Playwright with V8 client-side coverage (Chromium only) and Monocart Reporter for HTML test + coverage reports.
+
+### Prerequisites
+
+Local Supabase must be running:
+
+```bash
+pnpm supabase:start
+```
+
+Copy `.env.test.example` to `.env.test` (or let `supabase start` generate defaults):
+
+```bash
+cp .env.test.example .env.test
+```
+
+### Test Structure
+
+```
+tests/
+├── _shared/
+│   ├── app-fixtures.ts              # Merged fixtures (coverage + supabase test client)
+│   └── fixtures/
+│       └── supabase-test-client.ts  # Supabase service client for seeding test data
+├── books.test.ts                    # Books feature tests
+└── smoke.test.ts                    # Smoke test
+```
+
+All tests import `test` and `expect` from `_shared/app-fixtures` (not directly from Playwright).
+
+### Coverage Reports
+
+| Format        | Path                                              |
+| ------------- | ------------------------------------------------- |
+| Monocart HTML | `./coverage/tests/monocart-report.html`           |
+| V8 HTML       | `./coverage/tests/v8/index.html`                  |
+| LCOV          | `./coverage/tests/lcov/code-coverage.lcov.info`   |
+| Cobertura XML | `./coverage/tests/cobertura/code-coverage.cobertura.xml` |
+
 ## Git Hooks
 
 [Husky](https://typicode.github.io/husky/) manages Git hooks:
@@ -147,12 +193,11 @@ Hooks are installed automatically via the `prepare` script when running `pnpm in
 
 The `.github/workflows/ci.yml` workflow runs on push to `main` and on pull requests:
 
-1. Lint (Biome)
-2. Typecheck (`tsc --noEmit`)
-3. E2E tests (Playwright, Chromium only)
-4. Build (`next build` with Sentry source map upload)
+1. **lint** — Biome lint + TypeScript typecheck
+2. **test** — E2E tests (Playwright + local Supabase + V8 coverage via Monocart Reporter)
+3. **build** — Production build with Sentry source map upload (gated on lint + test)
 
-A `snyk` job runs in parallel, scanning dependencies for high-severity vulnerabilities and uploading the results as SARIF to GitHub Code Scanning. It is allowed to continue on error so findings do not block the pipeline.
+A **snyk** job runs in parallel, scanning dependencies for high-severity vulnerabilities and uploading the results as SARIF to GitHub Code Scanning. It is allowed to continue on error so findings do not block the pipeline.
 
 ### Required GitHub Configuration
 
