@@ -2,10 +2,10 @@
 
 ## Shared Code
 
-Cross-route frontend code lives under `src/shared/`, aliased as `@/shared/*`:
+Cross-route frontend code lives under `src/components/`, `src/hooks/`, and `src/lib/`:
 
 ```
-src/shared/
+src/
 ├── components/
 │   └── ui/                        # shadcn/ui primitives (button, dialog, etc.)
 ├── hooks/                         # reusable React hooks shared across routes
@@ -13,7 +13,7 @@ src/shared/
     └── utils.ts                   # cn() and other frontend utilities
 ```
 
-Backend code (DI containers, Supabase clients, env) lives under `src/lib/` (`@/lib/*`) — see the clean-architecture layers for details.
+Backend code (DI containers, Supabase clients, env) also lives under `src/lib/` (`@/lib/*`) — see the clean-architecture layers for details.
 
 ## Route Folder Pattern
 
@@ -42,9 +42,9 @@ src/app/{feature}/
 - `page.tsx` is composition-only: imports and arranges components, nothing else. No logic, no inline styles, no conditionals beyond prop-passing. Server data fetching happens here (async Server Component) and the data is passed down as props.
 - `actions.ts` handles all server logic: data fetchers and Server Actions (`"use server"`). See [Component Patterns](./01_COMPONENT-PATTERNS.md) for the container and use-case wiring pattern.
 - `components/` holds every sub-component for that route. Component files are named with the feature prefix (e.g. `ProductCard`, not `Card`).
-- `hooks/` holds hooks used only within that route. If a hook is needed by two or more routes, promote it to `src/shared/hooks/`.
+- `hooks/` holds hooks used only within that route. If a hook is needed by two or more routes, promote it to `src/hooks/`.
 - Components that use hooks, events, or browser APIs must start with `"use client"`. Keep the server/client boundary as low in the tree as possible - prefer Server Components and push `"use client"` down to leaf components.
-- Import shared UI via `@/shared/components/ui/*`, shared hooks via `@/shared/hooks/*`, and frontend utils via `@/shared/lib/*`.
+- Import shared UI via `@/components/ui/*`, shared hooks via `@/hooks/*`, and frontend utils via `@/lib/*`.
 
 ## Example
 
