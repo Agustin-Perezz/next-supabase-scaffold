@@ -1,7 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { OAuthProvider } from "@/domain/entities/oauth-provider.enum";
-import { Button } from "@/shared/components/ui/button";
 import { signInWithOAuthAction } from "../actions";
 
 export function OAuthButtons() {

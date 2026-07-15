@@ -2,9 +2,9 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { signInWithMagicLinkAction } from "../actions";
 
 function SubmitButton() {
