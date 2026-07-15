@@ -18,6 +18,7 @@ A production-ready [Next.js](https://nextjs.org) starter built on the App Router
 | E2E             | Playwright (Chromium) + Monocart Reporter    |
 | Monitoring      | Sentry (`@sentry/nextjs`)                      |
 | Security scan   | Snyk (SARIF → GitHub Code Scanning)            |
+| Code quality    | SonarCloud (static analysis + Quality Gate)    |
 | Package manager | pnpm 9                                         |
 | Git hooks       | Husky + nano-staged                            |
 
@@ -27,7 +28,7 @@ A production-ready [Next.js](https://nextjs.org) starter built on the App Router
 next-supabase-scaffold/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                # Lint, typecheck, E2E, build pipeline
+│       └── ci.yml                # SonarQube, lint, typecheck, E2E, build, Snyk pipeline
 ├── docs/                         # Engineering guidelines
 │   ├── 01_COMPONENT-PATTERNS.md
 │   ├── 02_FRONTEND-FOLDER-STRUCTURE.md
@@ -56,6 +57,7 @@ next-supabase-scaffold/
 ├── playwright.config.ts          # Playwright config (monocart reporter, V8 coverage)
 ├── playwright.monocart-reporter.ts  # Monocart coverage + report config
 ├── biome.json                    # Linter & formatter config
+├── sonar-project.properties       # SonarCloud analysis configuration
 ├── next.config.ts                # Next.js configuration
 ├── package.json
 ├── playwright.config.ts
@@ -193,11 +195,18 @@ Hooks are installed automatically via the `prepare` script when running `pnpm in
 
 The `.github/workflows/ci.yml` workflow runs on push to `main` and on pull requests:
 
-1. **lint** — Biome lint + TypeScript typecheck
-2. **test** — E2E tests (Playwright + local Supabase + V8 coverage via Monocart Reporter)
-3. **build** — Production build with Sentry source map upload (gated on lint + test)
+1. **sonar** — SonarCloud static analysis + Quality Gate (runs first; gates all other jobs)
+2. **lint** — Biome lint + TypeScript typecheck
+3. **test** — E2E tests (Playwright + local Supabase + V8 coverage via Monocart Reporter)
+4. **build** — Production build with Sentry source map upload (gated on lint + test)
 
-A **snyk** job runs in parallel, scanning dependencies for high-severity vulnerabilities and uploading the results as SARIF to GitHub Code Scanning. It is allowed to continue on error so findings do not block the pipeline.
+A **snyk** job runs in parallel (gated on sonar), scanning dependencies for high-severity vulnerabilities and uploading the results as SARIF to GitHub Code Scanning. It is allowed to continue on error so findings do not block the pipeline.
+
+```
+sonar ──┬──> lint ──┐
+        ├──> test ──┼──> build
+        └──> snyk
+```
 
 ### Required GitHub Configuration
 
@@ -207,10 +216,13 @@ Configure these in **Settings → Secrets and variables → Actions**.
 
 | Secret              | Description                            |
 | ------------------- | -------------------------------------- |
+| `SONAR_TOKEN`       | SonarCloud analysis token               |
 | `SENTRY_AUTH_TOKEN` | Sentry auth token for source map upload |
 | `SENTRY_ORG`        | Sentry organization slug               |
 | `SENTRY_PROJECT`    | Sentry project slug                    |
 | `SNYK_TOKEN`        | Snyk API token for vulnerability scans |
+
+> **Note:** `SONAR_TOKEN` is the only SonarCloud secret you need to add manually. `GITHUB_TOKEN` is provided automatically by GitHub Actions. No `SONAR_HOST_URL` is required for SonarCloud.
 
 **Variables** (public values, safe to expose):
 
