@@ -3,11 +3,7 @@ import {
   FileDropzoneError,
 } from "@/components/ui/file-dropzone-types";
 
-type DropzoneRejectCode = string;
-
-export function mapDropzoneErrorCode(
-  code: DropzoneRejectCode,
-): FileDropzoneError {
+export function mapDropzoneErrorCode(code: string): FileDropzoneError {
   if (code === "file-too-large") {
     return FileDropzoneError.FileSizeExceeded;
   }
@@ -17,6 +13,6 @@ export function mapDropzoneErrorCode(
   return FileDropzoneError.FileTypeInvalid;
 }
 
-export function getDropzoneErrorMessage(code: DropzoneRejectCode): string {
+export function getDropzoneErrorMessage(code: string): string {
   return FILE_DROPZONE_ERROR_MESSAGE[mapDropzoneErrorCode(code)];
 }
