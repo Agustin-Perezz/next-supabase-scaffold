@@ -161,18 +161,20 @@ pnpm test:unit:coverage   # run with V8 coverage → coverage/unit/lcov.info
 
 Unit tests are co-located next to the source they cover (`src/**/*.test.ts`) and run in the Node environment (no jsdom). The use-case repository interfaces (`*.repository.interface.ts`) make them dependency-free — pass a fake/in-memory repository, no Supabase required.
 
-### Coverage scope: logic in, boilerplate out
+### Coverage scope: Clean Architecture core in, outer layers out
 
-SonarCloud's coverage gate targets **logic, not volume**. The new-code gate (Clean as You Code) already limits the burden to code you add or change — not legacy. On top of that, declarative boilerplate is excluded from the coverage metric (in both `sonar.coverage.exclusions` and Vitest's `coverage.exclude`):
+SonarCloud's coverage gate targets **logic, not volume**. The new-code gate (Clean as You Code) already limits the burden to code you add or change — not legacy. On top of that, only the **Clean Architecture core** is in the coverage metric; the outer layers are excluded (in both `sonar.coverage.exclusions` and Vitest's `coverage.exclude`) because they are exercised by E2E, are framework/config glue, or are invisible to browser V8 coverage (Server Components, server actions).
 
-| In coverage scope (needs tests)            | Out of coverage scope (no tests required)            |
-| ------------------------------------------ | --------------------------------------------------- |
-| Use-cases (`*.use-case.ts`)                | DTOs (`*.dto.ts`) — type aliases / thin zod wiring  |
-| Entity validation (`book.entity.ts`)       | Zod schemas (`*.schema.ts`) — declarative rules     |
-| Mappers (`*.mapper.ts`)                    | Enums (`*.enum.ts`)                                 |
-| Repositories, `src/lib/**` utilities        | App shell, route handlers, middleware, generated types |
+| In coverage scope (needs unit tests)       | Out of coverage scope (E2E / glue, no unit tests required) |
+| ------------------------------------------ | --------------------------------------------------------- |
+| Use-cases (`*.use-case.ts`)                | DTOs (`*.dto.ts`), Zod schemas (`*.schema.ts`), enums (`*.enum.ts`) |
+| Entity validation (`book.entity.ts`)       | Repository interfaces (`*.repository.interface.ts`)       |
+| Mappers (`*.mapper.ts`)                    | Supabase repository implementations, server actions (`actions.ts`) |
+|                                            | Presentational components, shadcn UI (`components/ui/**`)  |
+|                                            | DI containers, env/Supabase/auth factories, Sentry config, instrumentation |
+|                                            | App shell, route handlers, middleware, generated types, `errors.ts`, `utils.ts` |
 
-Excluded files are still analyzed for **bugs, smells, and duplication** — they just don't count toward the coverage %. Write tests for new use-cases/mappers/entity logic; you can skip dedicated tests for new DTOs/schemas/enums (their validation is exercised transitively through the use-case and entity layers).
+Excluded files are still analyzed for **bugs, smells, and duplication** — they just don't count toward the coverage %. Write unit tests for new use-cases, entity logic, and mappers; the outer layers are covered by E2E. Tradeoff: new infrastructure/presentation code is smell/bug-gated, not coverage-gated.
 
 ### E2E tests
 
