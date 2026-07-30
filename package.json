@@ -14,6 +14,8 @@
     "test:ui": "supabase db reset && playwright test --ui",
     "test:ci": "playwright test",
     "test:install": "playwright install --with-deps chromium",
+    "test:unit": "vitest run",
+    "test:unit:coverage": "vitest run --coverage",
     "test:show-report": "npx monocart show-report ./coverage/tests/monocart-report.html",
     "coverage:show-report": "npx monocart show-report ./coverage/tests/v8/index.html",
     "supabase:start": "supabase start",
@@ -52,11 +54,13 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.10",
     "dotenv": "^17.4.2",
     "husky": "^9.1.7",
     "monocart-reporter": "^2.12.2",
     "nano-staged": "^1.0.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

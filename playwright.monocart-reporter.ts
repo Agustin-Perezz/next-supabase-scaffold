@@ -8,7 +8,7 @@ const coverageOptions: CoverageReportOptions = {
   outputDir: "./coverage/tests",
   reports: [
     ["v8", { outputFile: "v8/index.html" }],
-    ["lcov", { outputFile: "lcov/code-coverage.lcov.info" }],
+    ["lcov", { outputFile: "lcov.info" }],
     ["cobertura", { outputFile: "cobertura/code-coverage.cobertura.xml" }],
     ["console-summary"],
   ],
