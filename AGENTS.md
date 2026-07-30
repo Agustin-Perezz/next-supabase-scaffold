@@ -5,12 +5,14 @@ Next.js (App Router) starter with React 19, TypeScript strict mode, base-ui + sh
 ## Commands
 
 ```bash
-pnpm dev          # Start dev server
-pnpm typecheck    # TypeScript type checking (tsc --noEmit)
-pnpm lint         # Biome check
-pnpm format       # Biome format --write
-pnpm test         # Playwright run
-pnpm test:ui      # Playwright UI mode
+pnpm dev                # Start dev server
+pnpm typecheck          # TypeScript type checking (tsc --noEmit)
+pnpm lint               # Biome check
+pnpm format             # Biome format --write
+pnpm test               # Playwright E2E run (needs local Supabase)
+pnpm test:ui            # Playwright UI mode
+pnpm test:unit          # Vitest unit tests (no Supabase needed)
+pnpm test:unit:coverage # Vitest unit tests + V8 coverage → coverage/unit/lcov.info
 ```
 
 ## Key Constraints
@@ -31,7 +33,9 @@ If you need to write TypeScript, see [TypeScript Standards](./docs/03_TYPESCRIPT
 
 If you need to understand the Clean Architecture layering, DI containers, and Supabase wiring, see [Architecture](./docs/04_ARCHITECTURE.md).
 
-If you need to write tests, see Playwright patterns in the `tests/` directory and `playwright.config.ts`.
+If you need to write tests, see Playwright patterns in the `tests/` directory and `playwright.config.ts` (E2E). For pure Clean Architecture logic (use-cases, entity validation, mappers, utilities), co-locate a `*.test.ts` next to the source and run it with Vitest — the use-case `*.repository.interface.ts` ports let you pass a fake repository with no Supabase. Unit tests cover the server/Supabase code that browser V8 coverage cannot see; both LCOVs feed SonarCloud.
+
+Coverage scope is **logic, not volume**: write unit tests for new use-cases, mappers, entity logic, and utilities. Skip dedicated tests for declarative boilerplate — DTOs (`*.dto.ts`), Zod schemas (`*.schema.ts`), enums (`*.enum.ts`) — which are excluded from the coverage metric (see `sonar.coverage.exclusions` / `vitest.config.ts`). Excluded files are still scanned for bugs/smells/duplication.
 
 ## Supabase
 

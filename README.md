@@ -145,7 +145,36 @@ src/
 
 ## Testing
 
-E2E tests use Playwright with V8 client-side coverage (Chromium only) and Monocart Reporter for HTML test + coverage reports.
+The project has two complementary test layers, mapped to SonarCloud coverage:
+
+- **Unit tests (Vitest)** — cover the pure Clean Architecture core (use-cases, schemas/DTOs, mappers, utilities) and the server/Supabase code that browser coverage cannot see (Server Actions, route handlers, repositories). Fast feedback, runs locally with no Supabase.
+- **E2E tests (Playwright)** — Chromium-only, with V8 client-side coverage via the Monocart Reporter. Covers routes and client-rendered components end-to-end.
+
+> **Why two layers?** Playwright's browser V8 coverage only captures client-side JS. Server Components, server actions, route handlers, middleware, and the Postgres/Supabase repositories execute on the server and are invisible to it. Vitest covers that surface; Playwright covers the rest. SonarCloud merges both LCOVs.
+
+### Unit tests
+
+```bash
+pnpm test:unit            # run once
+pnpm test:unit:coverage   # run with V8 coverage → coverage/unit/lcov.info
+```
+
+Unit tests are co-located next to the source they cover (`src/**/*.test.ts`) and run in the Node environment (no jsdom). The use-case repository interfaces (`*.repository.interface.ts`) make them dependency-free — pass a fake/in-memory repository, no Supabase required.
+
+### Coverage scope: logic in, boilerplate out
+
+SonarCloud's coverage gate targets **logic, not volume**. The new-code gate (Clean as You Code) already limits the burden to code you add or change — not legacy. On top of that, declarative boilerplate is excluded from the coverage metric (in both `sonar.coverage.exclusions` and Vitest's `coverage.exclude`):
+
+| In coverage scope (needs tests)            | Out of coverage scope (no tests required)            |
+| ------------------------------------------ | --------------------------------------------------- |
+| Use-cases (`*.use-case.ts`)                | DTOs (`*.dto.ts`) — type aliases / thin zod wiring  |
+| Entity validation (`book.entity.ts`)       | Zod schemas (`*.schema.ts`) — declarative rules     |
+| Mappers (`*.mapper.ts`)                    | Enums (`*.enum.ts`)                                 |
+| Repositories, `src/lib/**` utilities        | App shell, route handlers, middleware, generated types |
+
+Excluded files are still analyzed for **bugs, smells, and duplication** — they just don't count toward the coverage %. Write tests for new use-cases/mappers/entity logic; you can skip dedicated tests for new DTOs/schemas/enums (their validation is exercised transitively through the use-case and entity layers).
+
+### E2E tests
 
 ### Prerequisites
 
@@ -180,9 +209,12 @@ All tests import `test` and `expect` from `_shared/app-fixtures` (not directly f
 | Format        | Path                                              |
 | ------------- | ------------------------------------------------- |
 | Monocart HTML | `./coverage/tests/monocart-report.html`           |
-| V8 HTML       | `./coverage/tests/v8/index.html`                  |
-| LCOV          | `./coverage/tests/lcov/code-coverage.lcov.info`   |
+| V8 HTML (E2E) | `./coverage/tests/v8/index.html`                  |
+| LCOV (E2E)    | `./coverage/tests/lcov.info`                      |
+| LCOV (unit)   | `./coverage/unit/lcov.info`                      |
 | Cobertura XML | `./coverage/tests/cobertura/code-coverage.cobertura.xml` |
+
+SonarCloud reads both LCOV files (`sonar.*.lcov.reportPaths=coverage/unit/lcov.info,coverage/tests/lcov.info`) so unit + E2E coverage feed a single analysis.
 
 ## Git Hooks
 
@@ -197,17 +229,18 @@ Hooks are installed automatically via the `prepare` script when running `pnpm in
 
 The `.github/workflows/ci.yml` workflow runs on push to `main` and on pull requests:
 
-1. **sonar** — SonarCloud static analysis + Quality Gate (runs first; gates all other jobs)
-2. **lint** — Biome lint + TypeScript typecheck
-3. **test** — E2E tests (Playwright + local Supabase + V8 coverage via Monocart Reporter)
+1. **lint** — Biome lint + TypeScript typecheck
+2. **test** — E2E tests (Playwright + local Supabase + V8 coverage via Monocart Reporter); uploads the `test-report` (E2E coverage) artifact
+3. **sonar** — SonarCloud static analysis + Quality Gate. **Runs after `test`**: it generates the Vitest unit coverage (`coverage/unit/lcov.info`), downloads the E2E coverage artifact (`coverage/tests/lcov.info`), then scans both so coverage is never missing from the report. PR decoration posts the gate status and inline issue comments to the PR.
 4. **build** — Production build with Sentry source map upload (gated on lint + test)
 
-A **snyk** job runs in parallel (gated on sonar), scanning dependencies for high-severity vulnerabilities and uploading the results as SARIF to GitHub Code Scanning. It is allowed to continue on error so findings do not block the pipeline.
+A **snyk** job runs in parallel, scanning dependencies for high-severity vulnerabilities and uploading the results as SARIF to GitHub Code Scanning. It is allowed to continue on error so findings do not block the pipeline.
 
 ```
-sonar ──┬──> lint ──┐
-        ├──> test ──┼──> build
-        └──> snyk
+lint ──┐
+       ├──> build
+test ──┼──> sonar
+snyk
 ```
 
 ### Required GitHub Configuration
@@ -233,6 +266,17 @@ Configure these in **Settings → Secrets and variables → Actions**.
 | `NEXT_PUBLIC_SUPABASE_URL`             | Supabase project URL            |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable (anon) key |
 | `NEXT_PUBLIC_SENTRY_DSN`               | Sentry DSN (client + server)    |
+
+### Shift-left: SonarCloud gate on every PR
+
+Coverage and code quality are enforced as early as possible (shift-left):
+
+1. **IDE — SonarLint Connected Mode.** Install the SonarLint extension (VS Code / JetBrains) and bind it to SonarCloud organization `general-organization`, project `Agustin-Perezz_next-supabase-scaffold`. This syncs the quality profile and surfaces issues in-editor before commit, in agreement with CI.
+2. **Pre-push — unit tests.** The Husky `pre-push` hook runs `pnpm test:unit` before the slower E2E suite, so pure-logic regressions fail fast locally.
+3. **PR — analysis + decoration.** The `sonar` job runs on every PR, posts the Quality Gate status and inline issue comments to the PR (PR decoration, enabled by the job's `pull-requests: write` permission), and reports only *new* issues introduced by the PR.
+4. **Merge gate — required check.** In **Settings → Branches → Branch protection rules** for `main`, add the **"SonarCloud Code Analysis"** check as a *required* status check so a failing Quality Gate blocks the merge.
+
+On SonarCloud, keep the **New Code Definition** set to `previous_version` and leave the Quality Gate on the default **Sonar way** (new-code coverage ≥ 80%, no new issues, new duplication ≤ 3%). Do not raise an overall-coverage condition until the unit suite matures — new-code-only keeps the gate achievable for server-action / route code that is covered by E2E or excluded.
 
 ## Documentation
 
