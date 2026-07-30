@@ -35,7 +35,7 @@ If you need to understand the Clean Architecture layering, DI containers, and Su
 
 If you need to write tests, see Playwright patterns in the `tests/` directory and `playwright.config.ts` (E2E). For pure Clean Architecture logic (use-cases, entity validation, mappers, utilities), co-locate a `*.test.ts` next to the source and run it with Vitest — the use-case `*.repository.interface.ts` ports let you pass a fake repository with no Supabase. Unit tests cover the server/Supabase code that browser V8 coverage cannot see; both LCOVs feed SonarCloud.
 
-Coverage scope is **logic, not volume**: write unit tests for new use-cases, mappers, entity logic, and utilities. Skip dedicated tests for declarative boilerplate — DTOs (`*.dto.ts`), Zod schemas (`*.schema.ts`), enums (`*.enum.ts`) — which are excluded from the coverage metric (see `sonar.coverage.exclusions` / `vitest.config.ts`). Excluded files are still scanned for bugs/smells/duplication.
+Coverage scope is the **Clean Architecture core**: write unit tests for new use-cases, entity logic, and mappers. The outer layers are excluded from the coverage metric — DTOs (`*.dto.ts`), Zod schemas (`*.schema.ts`), enums, repository interfaces, Supabase repository implementations, server actions (`actions.ts`), presentational components, shadcn UI (`components/ui/**`), DI containers, env/Supabase/auth factories, Sentry config, instrumentation, app shell, route handlers, middleware, generated types, `errors.ts`, `utils.ts` — because they are E2E-covered, framework/config glue, or invisible to browser V8 coverage (Server Components, server actions). See `sonar.coverage.exclusions` / `vitest.config.ts`. Excluded files are still scanned for bugs/smells/duplication.
 
 ## Supabase
 
