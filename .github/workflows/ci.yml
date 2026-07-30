@@ -13,7 +13,15 @@ concurrency:
 jobs:
   sonar:
     name: SonarCloud Analysis
+    # Coverage must exist before the scan: this job waits for the E2E test job
+    # (which uploads the Playwright/Monocart LCOV) and runs the fast Vitest unit
+    # coverage itself, then scans both reports.
+    needs: [test]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Required for SonarCloud PR decoration (inline issue comments + gate status).
+      pull-requests: write
     steps:
       - uses: actions/checkout@v7
         with:
@@ -24,6 +32,17 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Run unit tests with coverage
+        run: pnpm test:unit:coverage
+      - name: Download E2E coverage artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: test-report
+          path: coverage/tests
+      - name: Verify LCOV reports exist
+        run: |
+          test -f coverage/unit/lcov.info && echo "unit lcov ok"
+          test -f coverage/tests/lcov.info && echo "e2e lcov ok"
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v8.2.1
         env:
@@ -32,7 +51,6 @@ jobs:
 
   lint:
     name: Lint & Typecheck
-    needs: [sonar]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -47,7 +65,6 @@ jobs:
 
   test:
     name: E2E Tests
-    needs: [sonar]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -127,7 +144,6 @@ jobs:
 
   snyk:
     name: Security Scan
-    needs: [sonar]
     runs-on: ubuntu-latest
     permissions:
       security-events: write
