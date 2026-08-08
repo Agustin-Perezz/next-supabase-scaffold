@@ -137,3 +137,16 @@ const totalValue = allTasks
 const completedTasks = allTasks.filter((task) => task.type === COMPLETED);
 const totalValue = completedTasks.reduce((sum, task) => sum + task.value, 0);
 ```
+## Coding Conventions
+
+Always use braces for `if` statements:
+
+```ts
+// BAD
+if (!query) return this.books;
+
+// GOOD
+if (!query) {
+  return this.books;
+}
+```
