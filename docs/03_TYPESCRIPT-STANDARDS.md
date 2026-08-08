@@ -71,18 +71,6 @@ type ButtonProps = ComponentProps<"button"> & { variant?: ButtonVariant };
   ];
   ```
 
-## Coding Conventions
 
-Always use braces for `if` statements:
-
-```ts
-// BAD
-if (!query) return this.books;
-
-// GOOD
-if (!query) {
-  return this.books;
-}
-```
 
 If a utility function exists in more than one file, extract it to `@/lib/utils/` and import from there. The `@/*` path alias maps to `./src/*` (see `tsconfig.json`).
