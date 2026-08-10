@@ -270,7 +270,7 @@ Validation lives in `src/lib/shared/infrastructure/env.ts` — imported by both 
 After any schema change, regenerate the Supabase types:
 
 ```bash
-supabase gen types --typescript --project-id <ref> \
+supabase gen types --local --schema public \
   > src/infrastructure/database/postgres/database.types.ts
 ```
 
