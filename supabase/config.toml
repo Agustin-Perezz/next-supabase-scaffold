@@ -6,7 +6,7 @@ project_id = "next-supabase-scaffold"
 
 # Ports use env() indirection so each developer picks a distinct 5-port block
 # via supabase/.env (gitignored). Prevents cross-project container conflicts.
-# See docs/06_SUPABASE.md "Port conflicts between projects".
+# See docs/supabase.md "Port conflicts between projects".
 [api]
 port = "env(SUPABASE_API_PORT)"
 
