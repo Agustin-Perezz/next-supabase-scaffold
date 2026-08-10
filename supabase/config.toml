@@ -1,0 +1,28 @@
+# Local Supabase configuration.
+# Only non-default overrides live here — the CLI fills in the rest from defaults.
+# See https://supabase.com/docs/guides/local-development/cli/config for all options.
+
+project_id = "next-supabase-scaffold"
+
+# Ports use env() indirection so each developer picks a distinct 5-port block
+# via supabase/.env (gitignored). Prevents cross-project container conflicts.
+# See docs/06_SUPABASE.md "Port conflicts between projects".
+[api]
+port = "env(SUPABASE_API_PORT)"
+
+[db]
+port = "env(SUPABASE_DB_PORT)"
+shadow_port = "env(SUPABASE_DB_SHADOW_PORT)"
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[studio]
+port = "env(SUPABASE_STUDIO_PORT)"
+
+[local_smtp]
+port = "env(SUPABASE_INBUCKET_PORT)"
+
+[analytics]
+port = "env(SUPABASE_ANALYTICS_PORT)"
