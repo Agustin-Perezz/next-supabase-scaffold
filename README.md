@@ -105,14 +105,60 @@ The app runs at [http://localhost:3000](http://localhost:3000).
 
 ### Supabase Local Development
 
+This project uses a **local Supabase stack** for development and tests. The app's `.env` points to `http://127.0.0.1:55321` (not a remote project).
+
+**Prerequisites**: Docker running, Supabase CLI installed (`brew install supabase/tap/supabase` or see [CLI docs](https://supabase.com/docs/guides/local-development/cli/getting-started)).
+
+**Getting started:**
+
 ```bash
-supabase start                          # Start local Supabase stack
-supabase db pull                         # Pull remote schema into a new local migration
-supabase migration new <name>            # Create a blank migration file
-supabase db push                         # Apply local migrations to the linked project
-supabase gen types --typescript --project-id <ref>  # Regenerate src/infrastructure/database/postgres/database.types.ts
-supabase stop                            # Stop local stack
+# 1. Start the local stack (Docker, ~1 GB first pull, ~10s after)
+supabase start
+
+# 2. Get your API keys
+supabase status -o env
+# Copy API_URL, ANON_KEY (publishable), SERVICE_ROLE_KEY (secret)
+
+# 3. Fill in .env (app dev) and .env.test (tests)
+# .env:
+#   NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:55321
+#   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<publishable key>
+# .env.test:
+#   SUPABASE_URL=http://127.0.0.1:55321
+#   SUPABASE_SERVICE_ROLE_KEY=<secret key>
+#   NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:55321
+#   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<publishable key>
+
+# 4. Studio GUI at http://127.0.0.1:55323
 ```
+
+**Daily commands:**
+
+```bash
+supabase start               # Start stack
+supabase stop                # Stop (data persists)
+supabase stop --no-backup    # Stop and wipe all data
+supabase status -o env       # Show URLs + keys
+supabase db reset            # Wipe DB, replay migrations + seed
+```
+
+**Schema changes:**
+
+```bash
+supabase migration new <name>           # Create a blank migration
+supabase db reset                       # Apply all migrations to local DB
+pnpm supabase:gen-types                 # Regenerate types from local DB
+```
+
+**Deploy to remote** (when schema changes are ready for staging/prod):
+
+```bash
+supabase link --project-ref ypdlrfoioxdlcowdjpiz   # One-time per machine
+supabase db push --dry-run                         # Preview
+supabase db push                                   # Apply pending migrations
+```
+
+> **Port conflicts between projects?** This project uses `env()` port indirection in `supabase/config.toml` — each developer picks a distinct 5-port block via `supabase/.env` (gitignored). Defaults to 55321–55327. See [`docs/06_SUPABASE.md`](./docs/06_SUPABASE.md).
 
 ## Scripts
 
