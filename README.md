@@ -5,6 +5,25 @@
 
 A production-ready [Next.js](https://nextjs.org) starter structured around Clean Architecture with strict layering — domain entities and Zod invariant schemas at the core, application use cases depending only on repository interfaces, infrastructure providing Supabase-backed implementations, and the App Router delivery layer composing per-request DI containers rather than module-level singletons. Dependencies point inward toward the domain, so framework and I/O concerns stay at the edges. The scaffold takes a shift-left approach to quality: linting, type checking, static analysis, and E2E tests run on every push and pull request so issues surface as early as possible in the development cycle.
 
+## Table of Contents
+
+- [Tech Stack](#tech-stack)
+- [Folder Structure](#folder-structure)
+- [Setup](#setup)
+  - [Supabase Local Development](#supabase-local-development)
+- [Scripts](#scripts)
+- [Architecture](#architecture)
+- [Testing](#testing)
+  - [Unit tests](#unit-tests)
+  - [E2E tests](#e2e-tests)
+  - [Prerequisites](#prerequisites)
+  - [Test Structure](#test-structure)
+  - [Coverage Reports](#coverage-reports)
+- [Git Hooks](#git-hooks)
+- [CI (GitHub Actions)](#ci-github-actions)
+  - [Required GitHub Configuration](#required-github-configuration)
+- [Documentation](#documentation)
+
 ## Tech Stack
 
 | Area            | Choice                                        |
@@ -32,11 +51,10 @@ next-supabase-scaffold/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml                # SonarQube, lint, typecheck, E2E, build, Snyk pipeline
-├── docs/                         # Engineering guidelines
-│   ├── 01_COMPONENT-PATTERNS.md
-│   ├── 02_FRONTEND-FOLDER-STRUCTURE.md
-│   ├── 03_TYPESCRIPT-STANDARDS.md
-│   └── 04_ARCHITECTURE.md
+├── docs/                         # High-level docs for humans
+│   ├── architecture.md           # Clean Architecture concepts
+│   ├── supabase.md               # Supabase local dev operations
+│   └── development-guidelines.md # TypeScript and clean code standards
 ├── public/                       # Static assets served at root
 ├── src/
 │   ├── domain/                   # Pure entities + Zod invariant schemas (zero framework deps)
@@ -158,7 +176,7 @@ supabase db push --dry-run                         # Preview
 supabase db push                                   # Apply pending migrations
 ```
 
-> **Port conflicts between projects?** This project uses `env()` port indirection in `supabase/config.toml` — each developer picks a distinct 5-port block via `supabase/.env` (gitignored). Defaults to 55321–55327. See [`docs/06_SUPABASE.md`](./docs/06_SUPABASE.md).
+> **Port conflicts between projects?** This project uses `env()` port indirection in `supabase/config.toml` — each developer picks a distinct 5-port block via `supabase/.env` (gitignored). Defaults to 55321–55327. See [`docs/supabase.md`](./docs/supabase.md).
 
 ## Scripts
 
@@ -179,7 +197,7 @@ supabase db push                                   # Apply pending migrations
 
 ## Architecture
 
-This project follows Clean Architecture with strict layering. See [Architecture](./docs/04_ARCHITECTURE.md) for the full guide.
+This project follows Clean Architecture with strict layering. See [Architecture](./docs/architecture.md) for the full guide.
 
 ```
 src/
@@ -329,7 +347,6 @@ On SonarCloud, keep the **New Code Definition** set to `previous_version` and le
 
 ## Documentation
 
-- [Component Patterns](./docs/01_COMPONENT-PATTERNS.md)
-- [Frontend Folder Structure](./docs/02_FRONTEND-FOLDER-STRUCTURE.md)
-- [TypeScript Standards](./docs/03_TYPESCRIPT-STANDARDS.md)
-- [Architecture](./docs/04_ARCHITECTURE.md)
+- [Architecture](./docs/architecture.md) — Clean Architecture concepts
+- [Supabase](./docs/supabase.md) — Local dev operations
+- [Development Guidelines](./docs/development-guidelines.md) — TypeScript and clean code standards

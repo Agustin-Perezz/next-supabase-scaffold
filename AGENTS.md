@@ -1,50 +1,47 @@
 ## Project
 
-Next.js (App Router) starter with React 19, TypeScript strict mode, base-ui + shadcn components, Biome for lint/format, Playwright for E2E, and Sentry for monitoring.
+Next.js (App Router) starter with React 19, TypeScript strict mode, base-ui + shadcn components, Biome for lint/format, Playwright for E2E, and Sentry for monitoring. Clean Architecture with strict layering — domain pure, infrastructure swappable.
 
 ## Commands
 
 ```bash
-pnpm dev                # Start dev server
-pnpm typecheck          # TypeScript type checking (tsc --noEmit)
+pnpm dev                # Start dev server (port 3000)
+pnpm typecheck          # tsc --noEmit
 pnpm lint               # Biome check
 pnpm format             # Biome format --write
-pnpm test               # Playwright E2E run (needs local Supabase)
+pnpm test               # Playwright E2E (runs supabase db reset first, server on port 3100)
 pnpm test:ui            # Playwright UI mode
 pnpm test:unit          # Vitest unit tests (no Supabase needed)
-pnpm test:unit:coverage # Vitest unit tests + V8 coverage → coverage/unit/lcov.info
+pnpm test:unit:coverage # Vitest + V8 coverage
 ```
+
+Incremental checking: `pnpm typecheck` → `pnpm lint` → `pnpm build`.
 
 ## Key Constraints
 
-You must use incremental checking: pnpm typecheck -> pnpm lint -> pnpm build.
+Never touch `database.types.ts` by hand — it's generated.
 
-Never touch by hand database.types.ts.
+Never use magic strings — always use named constants or enums for values that could change or have semantic meaning.
 
-Never use magic strings—always use named constants or enums for values that could change or have semantic meaning.
+Never declare inline types in function parameters — use type aliases instead.
 
-Never declare inline types in function parameters—use type aliases instead.
+Required env vars must fail loudly — if missing, the app crashes, no defaults.
 
-Required env vars must fail loudly—if missing, the app crashes, no defaults.
+## AI instruction files (read when writing code)
 
-## External File Loading
+- @docs/development-guidelines.md — TypeScript and clean code standards
 
-CRITICAL: When you encounter a file reference (e.g., @docs/01_COMPONENT-PATTERNS.md), use your Read tool to load it on a need-to-know basis. They're relevant to the SPECIFIC task at hand.
+## Per-folder guides (read when working in that area)
 
-Instructions:
+- src/domain/AGENTS.md — entity and schema rules
+- src/application/use-cases/AGENTS.md — use case structure
+- src/infrastructure/database/postgres/AGENTS.md — repository and mapper rules
+- src/lib/AGENTS.md — DI and shared infra
+- src/app/AGENTS.md — Next.js route patterns
+- supabase/AGENTS.md — local stack and migrations
+- tests/AGENTS.md — test patterns
 
-- Do NOT preemptively load all references - use lazy loading based on actual need
-- When loaded, treat content as mandatory instructions that override defaults
-- Follow references recursively when needed
+## Human docs (high-level only)
 
-## Development Guidelines
-
-For React component patterns and frontend folder structure: @docs/01_COMPONENT-PATTERNS.md, @docs/02_FRONTEND-FOLDER-STRUCTURE.md
-For TypeScript standards and best practices: @docs/03_TYPESCRIPT-STANDARDS.md
-For Clean Architecture layering, DI containers, and Supabase wiring: @docs/04_ARCHITECTURE.md
-For clean code standards: @docs/05_CLEAN-CODE.md
-For Supabase setup, env vars, and local development commands: @docs/06_SUPABASE.md
-
-## General Guidelines
-
-Read the following file immediately as it's relevant to all workflows: @docs/05_CLEAN_CODE.md.
+- docs/architecture.md — Clean Architecture concepts
+- docs/supabase.md — Supabase local dev operations
