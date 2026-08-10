@@ -67,6 +67,14 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      SUPABASE_API_PORT: 55321
+      SUPABASE_DB_PORT: 55322
+      SUPABASE_DB_SHADOW_PORT: 55320
+      SUPABASE_STUDIO_PORT: 55323
+      SUPABASE_INBUCKET_PORT: 55324
+      SUPABASE_ANALYTICS_PORT: 55327
+      PORT: 3100
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -80,13 +88,6 @@ jobs:
         with:
           version: latest
       - name: Start Supabase
-        env:
-          SUPABASE_API_PORT: 55321
-          SUPABASE_DB_PORT: 55322
-          SUPABASE_DB_SHADOW_PORT: 55320
-          SUPABASE_STUDIO_PORT: 55323
-          SUPABASE_INBUCKET_PORT: 55324
-          SUPABASE_ANALYTICS_PORT: 55327
         run: supabase start -x imgproxy,edge-runtime,logflare,vector,supavisor
       - name: Reset database with migrations
         run: supabase db reset
