@@ -132,6 +132,28 @@ export function createBooksContainer(supabase: SupabaseClient<Database>) {
 
 > **Never** share module-level singletons that hold request-scoped resources. Construct the container at call time — inside the Server Action or Server Component function body.
 
+### Container scope
+
+One container per entry point. Only expose use cases that entry point actually calls — unused entry = wrong scope, split it out.
+
+```ts
+// WRONG — builds getBooks even though this actions.ts only creates
+export function createBooksContainer(supabase: SupabaseClient<Database>) {
+  return {
+    create: new CreateBookUseCase(new SupabaseCreateBookRepository(supabase)),
+    getBooks: new GetBooksUseCase(new SupabaseGetBooksRepository(supabase)),
+  };
+}
+
+// RIGHT — one container per entry point's use cases
+export function createBookWriteContainer(supabase: SupabaseClient<Database>) {
+  return { create: new CreateBookUseCase(new SupabaseCreateBookRepository(supabase)) };
+}
+export function createBookReadContainer(supabase: SupabaseClient<Database>) {
+  return { getBooks: new GetBooksUseCase(new SupabaseGetBooksRepository(supabase)) };
+}
+```
+
 ## Request Flow: Create a Book
 
 ```mermaid
