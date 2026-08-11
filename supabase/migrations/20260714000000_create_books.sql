@@ -18,3 +18,4 @@ create policy "Anyone can insert books"
   with check (true);
 
 grant select, insert on public.books to anon, authenticated;
+grant select, insert, update, delete on public.books to service_role;
