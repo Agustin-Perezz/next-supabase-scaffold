@@ -113,13 +113,19 @@ See [`AGENTS.md`](./AGENTS.md) for the engineering conventions agents and contri
    pnpm test:install
    ```
 
-3. Start the dev server:
+3. Start the Supabase local stack (see [Supabase Local Development](#supabase-local-development) below):
+
+   ```bash
+   supabase start
+   ```
+
+4. Start the dev server:
 
    ```bash
    pnpm dev
    ```
 
-The app runs at [http://localhost:3000](http://localhost:3000).
+The app runs at [http://localhost:3000](http://localhost:3000). On startup, the dev server logs the local Supabase URLs (Studio, Mailpit, API).
 
 ### Supabase Local Development
 
