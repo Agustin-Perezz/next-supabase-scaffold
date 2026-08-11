@@ -1,0 +1,19 @@
+import { expect, test } from "./_shared/app-fixtures";
+
+test("unauthenticated user is redirected to signin", async ({ page }) => {
+  await page.goto("/dashboard");
+
+  await expect(page).toHaveURL("/signin");
+});
+
+test("authenticated user sees dashboard with their email", async ({
+  authenticatedPage,
+  testUser,
+}) => {
+  await authenticatedPage.goto("/dashboard");
+
+  await expect(
+    authenticatedPage.getByRole("heading", { name: "Dashboard" }),
+  ).toBeVisible();
+  await expect(authenticatedPage.getByText(testUser.email)).toBeVisible();
+});
