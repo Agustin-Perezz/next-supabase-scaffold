@@ -148,7 +148,10 @@ supabase status -o env
 #   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<publishable key>
 
 # 4. Studio GUI at http://127.0.0.1:55323
+#    Mailpit (email testing) at http://127.0.0.1:55324
 ```
+
+**Auth providers:** Email (magic link) works out of the box — emails captured by Mailpit. Google and Facebook OAuth need provider setup and secrets in `supabase/.env` — see [`docs/supabase.md`](./docs/supabase.md) "Auth providers local development".
 
 **Daily commands:**
 

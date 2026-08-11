@@ -69,3 +69,22 @@ supabase db reset   # Verify locally
 ```
 
 Prefer local-first changes — keeps migrations as the source of truth.
+
+## Auth providers local development
+
+### Email (magic link)
+
+Works out of the box — no config needed. Local Supabase Auth has email enabled by default. Emails are captured by Mailpit at `http://127.0.0.1:55324` (not actually sent). Open the Mailpit UI to click the magic link during dev.
+
+### OAuth (Google, Facebook)
+
+`config.toml` has `[auth.external.google]` and `[auth.external.facebook]` with `enabled = true` and `client_id` (not a secret — safe to commit). The `secret` uses `env()` indirection — fill in `supabase/.env` (gitignored):
+
+```bash
+SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET=<secret>
+SUPABASE_AUTH_EXTERNAL_FACEBOOK_CLIENT_SECRET=<secret>
+```
+
+Put your `client_id` directly in `config.toml` (it's not a secret). Then restart the stack (`supabase stop && supabase start`).
+
+**Provider setup** (client ID, secret, redirect URIs): follow the official Supabase guides — [Google](https://supabase.com/docs/guides/auth/social-login/auth-google#local-development), [Facebook](https://supabase.com/docs/guides/auth/social-login/auth-facebook). The local callback URL is `http://127.0.0.1:55321/auth/v1/callback` (port matches `SUPABASE_API_PORT`).
