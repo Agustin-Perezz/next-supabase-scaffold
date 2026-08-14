@@ -7,6 +7,7 @@ import {
 
 const PROTECTED_PREFIXES = ["/dashboard"] as const;
 const SIGNIN_PATH = "/signin";
+const DASHBOARD_PATH = "/dashboard";
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -38,6 +39,10 @@ export async function proxy(request: NextRequest) {
 
   if (isProtected && !user) {
     return NextResponse.redirect(new URL(SIGNIN_PATH, request.url));
+  }
+
+  if (user && request.nextUrl.pathname === SIGNIN_PATH) {
+    return NextResponse.redirect(new URL(DASHBOARD_PATH, request.url));
   }
 
   return response;
