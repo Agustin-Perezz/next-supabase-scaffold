@@ -19,9 +19,9 @@ Incremental checking: `pnpm typecheck` → `pnpm lint` → `pnpm build`.
 
 ## Key Constraints
 
-Never touch `database.types.ts` by hand — it's generated.
+Never touch `database.types.ts` by hand — it is generated.
 
-Never use magic strings — always use named constants or enums for values that could change or have semantic meaning.
+Never use magic strings — always use named constants or enums for values that can change or have semantic meaning.
 
 Never declare inline types in function parameters — use type aliases instead.
 

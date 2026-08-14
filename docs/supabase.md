@@ -37,7 +37,7 @@ SUPABASE_INBUCKET_PORT=55324
 SUPABASE_ANALYTICS_PORT=55327
 ```
 
-Give each project on your machine a different block (e.g. project B uses 56321–56327). `config.toml` is committed (shared), `.env` is per-developer. CI reads ports dynamically from `supabase status -o env` — unaffected.
+Give each project on your machine a different block (for example, project B uses 56321–56327). `config.toml` is committed (shared). `.env` is per-developer. CI reads ports dynamically from `supabase status -o env` — unaffected.
 
 ## Dev and tests share the same local DB
 
@@ -49,7 +49,7 @@ Give each project on your machine a different block (e.g. project B uses 56321�
 
 ## Types and migrations: local vs remote
 
-**Types** (`database.types.ts`) are a build artifact, not pushed to Supabase. Regenerate from local DB after schema changes, commit the file, teammates get it via `git pull`. Never generate from remote during local dev — causes drift.
+**Types** (`database.types.ts`) are a build artifact, not pushed to Supabase. Regenerate from local DB after schema changes, commit the file, and teammates get it via `git pull`. Never generate from remote during local dev — it causes drift.
 
 **Migrations** live in `supabase/migrations/`, committed to git, run locally on every `db reset`. Pushing to remote is a deploy step:
 
@@ -59,7 +59,7 @@ supabase db push --dry-run                         # Preview
 supabase db push                                   # Apply pending migrations to remote
 ```
 
-Push when schema changes are ready for staging/prod — not on every commit. `db push` skips already-applied migrations (safe to re-run). Seed is never pushed by default; `--include-seed` for dev/staging only, never prod.
+Push when schema changes are ready for staging/prod — not on every commit. `db push` skips already-applied migrations (safe to re-run). Seed is never pushed by default. Use `--include-seed` for dev/staging only, never prod.
 
 **Pulling remote changes** (schema drift recovery):
 
@@ -74,17 +74,17 @@ Prefer local-first changes — keeps migrations as the source of truth.
 
 ### Email (magic link)
 
-Works out of the box — no config needed. Local Supabase Auth has email enabled by default. Emails are captured by Mailpit at `http://127.0.0.1:55324` (not actually sent). Open the Mailpit UI to click the magic link during dev.
+Works by default — no config needed. Local Supabase Auth has email enabled by default. Mailpit captures the emails at `http://127.0.0.1:55324` (it does not send them). Open the Mailpit UI to click the magic link during dev.
 
 ### OAuth (Google, Facebook)
 
-`config.toml` has `[auth.external.google]` and `[auth.external.facebook]` with `enabled = true` and `client_id` (not a secret — safe to commit). The `secret` uses `env()` indirection — fill in `supabase/.env` (gitignored):
+`config.toml` has `[auth.external.google]` and `[auth.external.facebook]` with `enabled = true` and `client_id` (not a secret — safe to commit). The `secret` uses `env()` indirection. Fill it in `supabase/.env` (gitignored):
 
 ```bash
 SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET=<secret>
 SUPABASE_AUTH_EXTERNAL_FACEBOOK_CLIENT_SECRET=<secret>
 ```
 
-Put your `client_id` directly in `config.toml` (it's not a secret). Then restart the stack (`supabase stop && supabase start`).
+Put your `client_id` directly in `config.toml` (it is not a secret). Then restart the stack (`supabase stop && supabase start`).
 
-**Provider setup** (client ID, secret, redirect URIs): follow the official Supabase guides — [Google](https://supabase.com/docs/guides/auth/social-login/auth-google#local-development), [Facebook](https://supabase.com/docs/guides/auth/social-login/auth-facebook). The local callback URL is `http://127.0.0.1:55321/auth/v1/callback` (port matches `SUPABASE_API_PORT`).
+**Provider setup** (client ID, secret, redirect URIs): follow the official Supabase guides — [Google](https://supabase.com/docs/guides/auth/social-login/auth-google#local-development), [Facebook](https://supabase.com/docs/guides/auth/social-login/auth-facebook). The local callback URL is `http://127.0.0.1:55321/auth/v1/callback` (the port matches `SUPABASE_API_PORT`).
