@@ -26,3 +26,11 @@ test("magic link with valid email shows success message", async ({ page }) => {
     page.getByText("Check your email for the sign-in link."),
   ).toBeVisible();
 });
+
+test("authenticated user is redirected to dashboard", async ({
+  authenticatedPage,
+}) => {
+  await authenticatedPage.goto("/signin");
+
+  await expect(authenticatedPage).toHaveURL("/dashboard");
+});
