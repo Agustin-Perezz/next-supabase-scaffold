@@ -29,19 +29,19 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: claims, error } = await supabase.auth.getClaims();
+
+  const hasUser = !error && claims !== null;
 
   const isProtected = PROTECTED_PREFIXES.some((prefix) =>
     request.nextUrl.pathname.startsWith(prefix),
   );
 
-  if (isProtected && !user) {
+  if (isProtected && !hasUser) {
     return NextResponse.redirect(new URL(SIGNIN_PATH, request.url));
   }
 
-  if (user && request.nextUrl.pathname === SIGNIN_PATH) {
+  if (hasUser && request.nextUrl.pathname === SIGNIN_PATH) {
     return NextResponse.redirect(new URL(DASHBOARD_PATH, request.url));
   }
 
