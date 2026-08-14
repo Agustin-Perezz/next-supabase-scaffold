@@ -17,3 +17,18 @@ test("authenticated user sees dashboard with their email", async ({
   ).toBeVisible();
   await expect(authenticatedPage.getByText(testUser.email)).toBeVisible();
 });
+
+test("authenticated user can sign out", async ({ authenticatedPage }) => {
+  await authenticatedPage.goto("/dashboard");
+
+  await expect(
+    authenticatedPage.getByRole("button", { name: "Sign out" }),
+  ).toBeVisible();
+
+  await authenticatedPage.getByRole("button", { name: "Sign out" }).click();
+
+  await expect(authenticatedPage).toHaveURL("/signin");
+  await expect(
+    authenticatedPage.getByRole("heading", { name: "Welcome" }),
+  ).toBeVisible();
+});

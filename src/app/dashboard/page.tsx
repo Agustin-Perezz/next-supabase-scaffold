@@ -1,4 +1,5 @@
 import { requireUser } from "@/lib/shared/infrastructure/auth.server";
+import { SignOutButton } from "./components/SignOutButton";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -12,6 +13,9 @@ export default async function DashboardPage() {
         <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
           Signed in as {user.email}
         </p>
+        <div className="mt-6">
+          <SignOutButton />
+        </div>
       </div>
     </div>
   );

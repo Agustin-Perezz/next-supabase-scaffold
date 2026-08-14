@@ -1,11 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ISignInWithMagicLinkRepository } from "@/application/use-cases/auth/sign-in-with-magic-link/sign-in-with-magic-link.repository.interface";
 import type { ISignInWithOAuthRepository } from "@/application/use-cases/auth/sign-in-with-oauth/sign-in-with-oauth.repository.interface";
+import type { ISignOutRepository } from "@/application/use-cases/auth/sign-out/sign-out.repository.interface";
 import type { OAuthProvider } from "@/domain/entities/oauth-provider.enum";
 import type { Database } from "../../database.types";
 
 export class SupabaseAuthRepository
-  implements ISignInWithMagicLinkRepository, ISignInWithOAuthRepository
+  implements
+    ISignInWithMagicLinkRepository,
+    ISignInWithOAuthRepository,
+    ISignOutRepository
 {
   constructor(private readonly supabase: SupabaseClient<Database>) {}
 
@@ -42,5 +46,13 @@ export class SupabaseAuthRepository
     }
 
     return data.url;
+  }
+
+  async signOut(): Promise<void> {
+    const { error } = await this.supabase.auth.signOut({ scope: "local" });
+
+    if (error) {
+      throw new Error(`Failed to sign out: ${error.message}`);
+    }
   }
 }
