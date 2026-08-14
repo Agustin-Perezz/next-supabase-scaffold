@@ -16,8 +16,8 @@ AI-focused code standards. Follow these when writing or modifying code.
 - Short, single-responsibility functions — if you can describe it with "and", split it.
 - Guard clauses over nesting — early returns, happy path flat and last.
 - Descriptive names — state what and why, not how. No `data`, `temp`, `info`.
-- DRY — extract on third occurrence, don't pre-extract for hypothetical reuse (YAGNI).
-- Comments explain why, not what — don't restate code.
+- DRY — extract on third occurrence, do not pre-extract for hypothetical reuse (YAGNI).
+- Comments explain why, not what — do not restate code.
 - Boring code — plain step-by-step over dense one-liners. Named intermediates document intent.
 - Always use braces for `if` statements.
 - When in doubt, optimize for the next reader, not the current writer.

@@ -13,14 +13,14 @@ Tests MUST NOT assume clean DB state. Per Supabase guidance, resetting per test 
 - **Unique IDs**: every test file uses a `RUN_ID = crypto.randomUUID()` prefix for all data it inserts.
 - **beforeAll**: seed test-specific data with unique prefix via service role client.
 - **afterAll**: clean up by deleting rows matching the prefix (`like("title", "${PREFIX}%")`).
-- **No count assertions**: assert presence of specific elements, not row counts (parallel workers may insert concurrently).
+- **No count assertions**: assert presence of specific elements, not row counts (parallel workers can insert concurrently).
 
 ## Auth fixtures
 
 - `tests/_shared/fixtures/auth-fixtures.ts` — `createTestUser`, `deleteTestUser`, `signInAndGetCookies`.
 - `testUser` fixture (worker scope): creates a real user via `auth.admin.createUser` with `email_confirm: true`, cleans up in afterAll.
 - `authenticatedPage` fixture: signs in via service role, injects session cookies into a fresh browser context — real cookie-based session, no mocking.
-- Use `authenticatedPage` for protected routes (e.g. `/dashboard`), `page` for public routes.
+- Use `authenticatedPage` for protected routes (for example, `/dashboard`), `page` for public routes.
 - Session cookie name: `sb-127-auth-token` (derived from `NEXT_PUBLIC_SUPABASE_URL` hostname).
 
 ## Infrastructure
