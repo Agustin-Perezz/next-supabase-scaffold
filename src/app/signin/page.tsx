@@ -3,7 +3,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { MagicLinkForm } from "./components/MagicLinkForm";
 import { OAuthButtons } from "./components/OAuthButtons";
@@ -14,9 +13,9 @@ export default function SignInPage() {
       <div className="w-full max-w-md">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold tracking-tight">
+            <h1 className="font-heading text-2xl font-bold tracking-tight">
               Sign in or sign up
-            </CardTitle>
+            </h1>
             <CardDescription>
               Use a magic link or an OAuth provider to continue
             </CardDescription>

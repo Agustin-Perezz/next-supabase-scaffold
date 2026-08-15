@@ -29,6 +29,6 @@ test("authenticated user can sign out", async ({ authenticatedPage }) => {
 
   await expect(authenticatedPage).toHaveURL("/signin");
   await expect(
-    authenticatedPage.getByRole("heading", { name: "Welcome" }),
+    authenticatedPage.getByRole("heading", { name: "Sign in or sign up" }),
   ).toBeVisible();
 });
