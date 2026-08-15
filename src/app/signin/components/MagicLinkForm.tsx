@@ -1,5 +1,6 @@
 "use client";
 
+import { Mail } from "lucide-react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
@@ -11,8 +12,15 @@ function SubmitButton() {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" disabled={pending} className="w-full">
-      {pending ? "Sending..." : "Send Magic Link"}
+    <Button type="submit" size="lg" disabled={pending} className="w-full">
+      {pending ? (
+        "Sending..."
+      ) : (
+        <>
+          <Mail />
+          Send Magic Link
+        </>
+      )}
     </Button>
   );
 }

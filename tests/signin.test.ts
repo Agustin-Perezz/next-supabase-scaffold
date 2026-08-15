@@ -3,7 +3,9 @@ import { expect, test } from "./_shared/app-fixtures";
 test("signin page renders all elements", async ({ page }) => {
   await page.goto("/signin");
 
-  await expect(page.getByRole("heading", { name: "Welcome" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Sign in or sign up" }),
+  ).toBeVisible();
   await expect(page.getByLabel("Email")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Send Magic Link" }),
