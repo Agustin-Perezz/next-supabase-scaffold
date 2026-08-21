@@ -125,7 +125,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /tmp/supabase-images.tar
-          key: supabase-images-${{ hashFiles('supabase/config.toml') }}
+          key: supabase-images-v2-${{ hashFiles('supabase/config.toml') }}
       - name: Get Playwright version
         id: playwright-version
         run: echo "version=$(pnpm list @playwright/test --depth=0 --json | jq -r '.[0].devDependencies["@playwright/test"].version')" >> $GITHUB_OUTPUT
