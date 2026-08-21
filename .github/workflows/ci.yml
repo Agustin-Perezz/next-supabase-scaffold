@@ -118,8 +118,8 @@ jobs:
         run: |
           mkdir -p /tmp
           docker images --format '{{.Repository}}:{{.Tag}}' \
-            | grep -iE 'supabase|postgrest|gotrue|realtime|kong|inbucket|mailer|analytics' \
-            | xargs -I {} docker save {} -o /tmp/supabase-images.tar
+            | grep -iE 'supabase|postgrest|gotrue|realtime|kong|inbucket|mailpit|analytics' \
+            | xargs docker save -o /tmp/supabase-images.tar
       - name: Save cache
         if: steps.supabase-cache.outputs.cache-hit != 'true' && always()
         uses: actions/cache/save@v4
