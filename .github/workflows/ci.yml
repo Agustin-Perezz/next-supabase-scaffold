@@ -101,7 +101,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: /tmp/supabase-images.tar
-          key: supabase-images-${{ hashFiles('supabase/config.toml') }}
+          key: supabase-images-v2-${{ hashFiles('supabase/config.toml') }}
       - name: Load cached Docker images
         if: steps.supabase-cache.outputs.cache-hit == 'true'
         run: docker load -i /tmp/supabase-images.tar
@@ -118,14 +118,14 @@ jobs:
         run: |
           mkdir -p /tmp
           docker images --format '{{.Repository}}:{{.Tag}}' \
-            | grep -iE 'supabase|postgrest|gotrue|realtime|kong|inbucket|mailer|analytics' \
-            | xargs -I {} docker save {} -o /tmp/supabase-images.tar
+            | grep -iE 'supabase|postgrest|gotrue|realtime|kong|inbucket|mailpit|analytics' \
+            | xargs docker save -o /tmp/supabase-images.tar
       - name: Save cache
         if: steps.supabase-cache.outputs.cache-hit != 'true' && always()
         uses: actions/cache/save@v4
         with:
           path: /tmp/supabase-images.tar
-          key: supabase-images-${{ hashFiles('supabase/config.toml') }}
+          key: supabase-images-v2-${{ hashFiles('supabase/config.toml') }}
       - name: Get Playwright version
         id: playwright-version
         run: echo "version=$(pnpm list @playwright/test --depth=0 --json | jq -r '.[0].devDependencies["@playwright/test"].version')" >> $GITHUB_OUTPUT
