@@ -101,7 +101,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: /tmp/supabase-images.tar
-          key: supabase-images-${{ hashFiles('supabase/config.toml') }}
+          key: supabase-images-v2-${{ hashFiles('supabase/config.toml') }}
       - name: Load cached Docker images
         if: steps.supabase-cache.outputs.cache-hit == 'true'
         run: docker load -i /tmp/supabase-images.tar
