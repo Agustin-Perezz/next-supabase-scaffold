@@ -309,17 +309,15 @@ The `.github/workflows/ci.yml` workflow runs on push to `main` and on pull reque
 
 1. **lint** — Biome lint + TypeScript typecheck
 2. **unit-test** — Vitest unit tests with V8 coverage (`coverage/unit/lcov.info`). Uploads the coverage artifact.
-3. **test** — E2E tests (Playwright + local Supabase + V8 coverage via Monocart Reporter, local only).
-4. **sonar** — SonarCloud static analysis + Quality Gate. **Runs after `unit-test`**: it downloads the coverage artifact (`coverage/unit/lcov.info`), then scans. PR decoration posts the gate status and inline issue comments to the PR.
+3. **sonar** — SonarCloud static analysis + Quality Gate. **Runs after `unit-test`**: it downloads the coverage artifact (`coverage/unit/lcov.info`), then scans. PR decoration posts the gate status and inline issue comments to the PR.
+4. **test** — E2E tests (Playwright + local Supabase + V8 coverage via Monocart Reporter, local only). **Runs after `sonar`**: static analysis and coverage gate pass before E2E.
 5. **build** — Production build with Sentry source map upload (gated on lint + test)
 
 A **snyk** job runs in parallel. It scans dependencies for high-severity vulnerabilities and uploads the results as SARIF to GitHub Code Scanning. It can continue on error, so findings do not block the pipeline.
 
 ```
-unit-test ──> sonar
-lint ───────┐
-           ├──> build
-test ───────┘
+lint ──────────────────────────┐
+unit-test ──> sonar ──> test ──┼──> build
 snyk
 ```
 
