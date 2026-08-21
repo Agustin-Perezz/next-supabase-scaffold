@@ -23,8 +23,9 @@ export default defineConfig({
       reportsDirectory: "./coverage/unit",
       // Scope = Clean Architecture core only. Include is narrower than exclude:
       // new outer files land outside coverage by default, no drift, no dead globs.
-      // LCOV file set matches the SonarCloud denominator (sonar.coverage.exclusions
-      // narrows to the same 6 files) so the gate still agrees.
+      // sonar.coverage.exclusions in sonar-project.properties aligns the SonarCloud
+      // denominator to this same scope — delivery layer and infrastructure are
+      // excluded from the coverage gate (covered by E2E, not unit tests).
       include: [
         "src/application/use-cases/**/*.use-case.ts",
         "src/domain/entities/**/*.entity.ts",
