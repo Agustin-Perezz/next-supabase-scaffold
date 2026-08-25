@@ -47,7 +47,9 @@ test("books page loads and shows heading", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Add" })).toBeVisible();
 });
 
-test("user can create a book via the form", async ({ page }) => {
+test("user can create a book via the form", async ({
+  authenticatedPage: page,
+}) => {
   const title = `${TEST_PREFIX}-create-${Date.now()}`;
   const author = `${TEST_PREFIX} Created Author`;
 
