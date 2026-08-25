@@ -1,5 +1,9 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/infrastructure/database/postgres/database.types";
+import {
+  supabaseTestServiceRoleKey,
+  supabaseTestUrl,
+} from "./supabase-test-client";
 
 const AUTH_STORAGE_KEY = "sb-127-auth-token";
 const APP_COOKIE_DOMAIN = "localhost";
@@ -55,7 +59,19 @@ export async function signInAndGetCookies(
   email: string,
   password: string,
 ): Promise<SessionCookies> {
-  const { data, error } = await admin.auth.signInWithPassword({
+  // Use a separate ephemeral client so the admin client's auth state is not mutated.
+  const ephemeralClient = createClient<Database>(
+    supabaseTestUrl,
+    supabaseTestServiceRoleKey,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    },
+  );
+
+  const { data, error } = await ephemeralClient.auth.signInWithPassword({
     email,
     password,
   });
