@@ -1,7 +1,7 @@
-import { getBooks } from "./actions";
 import { BookCreateForm } from "./components/BookCreateForm";
 import { BookHeader } from "./components/BookHeader";
 import { BookList } from "./components/BookList";
+import { getBooks } from "./queries";
 
 export default async function BooksPage() {
   const books = await getBooks();
