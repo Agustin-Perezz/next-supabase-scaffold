@@ -10,6 +10,15 @@ Next.js App Router delivery layer.
 - `hooks/` = route-private hooks. Promote to `src/hooks/` if used by 2+ routes.
 - Import shared UI via `@/components/ui/*`, hooks via `@/hooks/*`, utils via `@/lib/*`.
 
+## TTB — fast first byte is a priority
+
+Time to first byte (TTB) matters here. Every route MUST be designed so the server responds fast, even when data is slow.
+
+- Prefer **PPR (Partial Prerendering)**: keep the static shell in `page.tsx` and wrap slow/dynamic data in `<Suspense>` boundaries. The shell ships instantly; the dynamic part streams in.
+- Prefer **ISR** for pages whose data changes infrequently — serve a cached page and revalidate in the background instead of rendering on every request.
+- If a page genuinely must be rendered per-request (fully dynamic, per-user), always add a `loading.tsx` next to it so the user gets instant UI feedback while the server renders.
+- Never block the whole page on a slow query: push data fetching down into a Suspense-bound child component instead of awaiting at the top of `page.tsx`.
+
 ## Server action authentication (MANDATORY)
 
 Server Actions are public endpoints — callable directly, bypassing `proxy.ts`. Every action MUST call `requireUser()` as its first line:
