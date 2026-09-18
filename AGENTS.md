@@ -27,6 +27,8 @@ Never declare inline types in function parameters — use type aliases instead.
 
 Required env vars must fail loudly — if missing, the app crashes, no defaults.
 
+Repositories must be flat and implement exactly ONE interface per repository. Exception: `SupabaseAuthRepository` may implement multiple auth-related interfaces only when they share the same cohesive responsibility (e.g., all use `supabase.auth` and handle authentication flows).
+
 ## AI instruction files (read when writing code)
 
 - @docs/development-guidelines.md — TypeScript and clean code standards
