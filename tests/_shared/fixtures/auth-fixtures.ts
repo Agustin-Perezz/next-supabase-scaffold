@@ -55,7 +55,6 @@ export type SessionCookies = {
 }[];
 
 export async function signInAndGetCookies(
-  admin: SupabaseClient<Database>,
   email: string,
   password: string,
 ): Promise<SessionCookies> {

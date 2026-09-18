@@ -37,7 +37,6 @@ const test = base.extend<{
   authenticatedPage: async ({ browser, testUser }, use) => {
     const context = await browser.newContext();
     const cookies = await signInAndGetCookies(
-      supabaseTestClient,
       testUser.email,
       testUser.password,
     );
